@@ -1,6 +1,7 @@
 ﻿using CarRentingSystem.Data;
 using CarRentingSystem.Data.Models;
 using CarRentingSystem.Models.Cars;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,30 @@ namespace CarRentingSystem.Controllers
              
             this.data.SaveChanges();
 
-            return this.RedirectToAction("Index", "Home");
+            return this.RedirectToAction(nameof(All));
+        }
+
+        public IActionResult All(string searchTerm )
+        {
+            var cars = this.data
+                .Cars
+                .OrderByDescending(c => c.Id)
+                .Select(c => new CarListingViewModel
+                {
+                    Id = c.Id,
+                    Brand = c.Brand,
+                    Model = c.Model,
+                    ImageUrl = c.ImageUrl,
+                    Year = c.Year,
+                    Category = c.Category.Name
+                })
+                .ToList();
+
+            return this.View(new AllCarsQueryModel
+            {
+                Cars = cars,
+                SearchTerm = searchTerm   
+            });
         }
 
         private IEnumerable<CarCategoryViewModel> GetCarCategories()
