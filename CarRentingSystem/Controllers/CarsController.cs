@@ -1,9 +1,13 @@
 ﻿using CarRentingSystem.Data;
 using CarRentingSystem.Data.Models;
+using CarRentingSystem.Infrastructure;
 using CarRentingSystem.Models.Cars;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace CarRentingSystem.Controllers
 {
@@ -16,8 +20,14 @@ namespace CarRentingSystem.Controllers
             this.data = data;
         }
 
+        [Authorize]
         public IActionResult Add()
         {
+            if (!this.UserIsDealer())
+            {
+                return RedirectToAction(nameof(DealersController.Become), "Dealers");
+            }
+
             return this.View(new AddCarFormModel
             {
                 Categories = this.GetCarCategories()
@@ -25,8 +35,20 @@ namespace CarRentingSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Add(AddCarFormModel car)
         {
+            var dealerId = this.data
+                .Dealers
+                .Where(d => d.UserId == this.User.GetId())
+                .Select(d => d.Id)
+                .FirstOrDefault();
+
+            if (dealerId == 0)
+            {
+                return RedirectToAction(nameof(DealersController.Become), "Dealers");
+            }
+
             if (!this.data.Categories.Any(c => c.Id == car.CategoryId))
             {
                 this.ModelState.AddModelError(nameof(car.CategoryId), "Category does not exist.");
@@ -38,17 +60,18 @@ namespace CarRentingSystem.Controllers
                 return this.View(car);
             }
 
-            var newCar = new Car
+            var carData = new Car
             {
                 Brand = car.Brand,
                 Model = car.Model,
                 Description = car.Description,
                 ImageUrl = car.ImageUrl,
                 Year = car.Year,
-                CategoryId = car.CategoryId
+                CategoryId = car.CategoryId,
+                DealerId = dealerId,
             };
 
-            this.data.Cars.Add(newCar);
+            this.data.Cars.Add(carData);
 
             this.data.SaveChanges();
 
@@ -105,6 +128,13 @@ namespace CarRentingSystem.Controllers
             query.Cars = cars;
             
             return this.View(query);
+        }
+
+        private bool UserIsDealer()
+        {
+            return this.data
+                .Dealers
+                .Any(d => d.UserId == this.User.GetId());
         }
 
         private IEnumerable<CarCategoryViewModel> GetCarCategories()

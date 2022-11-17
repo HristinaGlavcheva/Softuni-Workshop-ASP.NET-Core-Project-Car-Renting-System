@@ -20,19 +20,22 @@ namespace CarRentingSystem.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Car>()
+            builder
+                .Entity<Car>()
                 .HasOne(c => c.Category)
                 .WithMany(c => c.Cars)
                 .HasForeignKey(c => c.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<Car>()
-                .HasOne(d => d.Dealer)
-                .WithMany(c => c.Cars)
+            builder
+                .Entity<Car>()
+                .HasOne(c => c.Dealer)
+                .WithMany(d => d.Cars)
                 .HasForeignKey(c => c.DealerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<Dealer>()
+            builder
+                .Entity<Dealer>()
                 .HasOne<IdentityUser>()
                 .WithOne()
                 .HasForeignKey<Dealer>(d => d.UserId)
