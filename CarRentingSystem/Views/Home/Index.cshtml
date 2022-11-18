@@ -42,7 +42,7 @@
             <div class="carousel-item">
                 <img class="d-block w-100" src="@secondCar.ImageUrl" alt="@secondCar.Brand - @secondCar.Model">
                 <div class="carousel-caption d-none d-md-block">
-                    <h5><a class="btn btn-primary"  asp-controller="Cars" asp-action="Details" asp-route-id="@secondCar.Id">@secondCar.Year @secondCar.Brand @secondCar.Model</a></h5>
+                    <h5><a class="btn btn-primary" asp-controller="Cars" asp-action="Details" asp-route-id="@secondCar.Id">@secondCar.Year @secondCar.Brand @secondCar.Model</a></h5>
                 </div>
             </div>
         }
@@ -51,7 +51,7 @@
             <div class="carousel-item">
                 <img class="d-block w-100" src="@thirdCar.ImageUrl" alt="@thirdCar.Brand - @thirdCar.Model">
                 <div class="carousel-caption d-none d-md-block">
-                    <h5><a class="btn btn-primary"  asp-controller="Cars" asp-action="Details" asp-route-id="@thirdCar.Id">@thirdCar.Year @thirdCar.Brand @thirdCar.Model</a></h5>
+                    <h5><a class="btn btn-primary" asp-controller="Cars" asp-action="Details" asp-route-id="@thirdCar.Id">@thirdCar.Year @thirdCar.Brand @thirdCar.Model</a></h5>
                 </div>
             </div>
         }
@@ -66,16 +66,33 @@
     </a>
 </div>
 
-<div class="jumbotron">
-    <div class="row">
-        <h2 class="col-md-4 text-center">
-            @Model.TotalCars Cars
-        </h2>
-        <h2 class="col-md-4 text-center">
-            @Model.TotalUsers Users
-        </h2>
-        <h2 class="col-md-4 text-center">
-            @Model.TotalRents Rents
-        </h2>
+<div class="mb-5"></div>
+
+<div class="row">
+    <div class="col-12 text-center">
+        <button class="btn btn-primary" id="statistics-button">Show Statistics</button>
     </div>
 </div>
+
+<div class="jumbotron d-none" id="statistics">
+    <div class="row">
+        <h2 class="col-md-4 text-center" id="total-cars"></h2>
+        <h2 class="col-md-4 text-center" id="total-users"></h2>
+        <h2 class="col-md-4 text-center" id="total-rents"></h2>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $('#statistics-button').on('click', ev => {
+            $.get('/api/statistics', (data) => {
+                $('#total-cars').text(data.totalCars + " Cars");
+                $('#total-users').text(data.totalUsers + " Users");
+                $('#total-rents').text(data.totalRents + " Rents");
+
+                $('#statistics').removeClass('d-none');
+                $('#statistics-button').hide();
+            })
+        })
+    </script>
+}
