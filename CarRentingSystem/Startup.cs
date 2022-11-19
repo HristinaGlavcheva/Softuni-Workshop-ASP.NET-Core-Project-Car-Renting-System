@@ -1,5 +1,7 @@
 using CarRentingSystem.Data;
 using CarRentingSystem.Infrastructure;
+using CarRentingSystem.Services.Cars;
+using CarRentingSystem.Services.Statistics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -29,6 +31,9 @@ namespace CarRentingSystem
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<CarRentingDbContext>();
             services.AddControllersWithViews();
+
+            services.AddTransient<IStatisticsService, StatisticsService>();
+            services.AddTransient<ICarService, CarService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
