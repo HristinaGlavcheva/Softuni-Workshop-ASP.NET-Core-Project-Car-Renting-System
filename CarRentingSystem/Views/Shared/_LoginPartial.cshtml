@@ -7,7 +7,7 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        var userId = User.GetId();
+        var userId = User.Id();
         var userIsDealer = Dealers.IsDealer(userId);
 
         if (userIsDealer)
